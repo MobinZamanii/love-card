@@ -1,0 +1,376 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>June 21 — I Love You</title>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    background:#000;color:#fff;font-family:Georgia,serif;overflow:hidden;
+    display:flex;align-items:center;justify-content:center;
+  }
+
+  /* Background canvas (stars, nebula, shooting star) */
+  canvas#bg{
+    position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none;display:block;
+  }
+
+  /* Global aurora bands */
+  .aurora-layer{
+    position:fixed;inset:0;z-index:1;pointer-events:none;mix-blend-mode:screen;opacity:.92;
+  }
+  .aurora-band{
+    position:absolute;left:-10%;width:120%;height:28%;border-radius:50%;
+    filter:blur(36px) saturate(150%);transform-origin:center;opacity:0.95;
+    animation:auroraDrift 8s ease-in-out infinite;pointer-events:none;
+  }
+  .band1{top:18%;background:linear-gradient(90deg, rgba(80,200,255,0.18), rgba(120,80,255,0.12), rgba(255,160,200,0.06));animation-duration:9s}
+  .band2{top:30%;background:linear-gradient(90deg, rgba(40,255,180,0.12), rgba(120,80,255,0.08), rgba(255,120,160,0.04));animation-duration:11s;filter:blur(44px) saturate(160%)}
+  .band3{top:42%;background:linear-gradient(90deg, rgba(200,120,255,0.10), rgba(80,220,200,0.06), rgba(255,120,160,0.03));animation-duration:13s;filter:blur(52px) saturate(150%)}
+  @keyframes auroraDrift{
+    0%{transform:translateX(-6%) translateY(0) rotate(-2deg) scaleX(1);opacity:.9}
+    50%{transform:translateX(6%) translateY(-8px) rotate(2deg) scaleX(1.02);opacity:1}
+    100%{transform:translateX(-6%) translateY(0) rotate(-2deg) scaleX(1);opacity:.9}
+  }
+
+  /* Moon image container (use a real moon image file named moon.jpg in the repo) */
+  .moon-wrap{
+    position:fixed;left:10%;top:10%;width:160px;height:160px;z-index:2;pointer-events:none;
+    border-radius:50%;overflow:hidden;filter:drop-shadow(0 12px 36px rgba(0,0,0,0.6));
+  }
+  .moon-wrap img{width:100%;height:100%;object-fit:cover;display:block}
+  .moon-glow{
+    position:absolute;inset:-20%;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, rgba(255,255,230,0.14), rgba(255,200,160,0.04) 18%, rgba(0,0,0,0) 45%);
+    filter:blur(10px);pointer-events:none;z-index:0;
+  }
+
+  /* Center card */
+  .card{
+    position:relative;z-index:10;text-align:center;padding:40px 30px;
+    display:flex;flex-direction:column;align-items:center;gap:20px;pointer-events:none;
+  }
+
+  /* HAPPY BIRTHDAY above date badge */
+  .happy{
+    position:absolute;top:-8px;left:50%;transform:translateX(-50%);z-index:15;
+    font-family:Georgia,serif;font-weight:800;color:#fff;letter-spacing:4px;font-size:20px;
+    text-transform:uppercase;pointer-events:none;
+    text-shadow:0 0 6px rgba(255,255,255,0.95),0 0 18px rgba(255,200,220,0.9),0 0 36px rgba(255,120,160,0.6),0 0 60px rgba(200,80,140,0.35);
+    animation:happyGlow 2.2s ease-in-out infinite;
+  }
+  @keyframes happyGlow{
+    0%{transform:translateX(-50%) scale(.98);opacity:.92}
+    50%{transform:translateX(-50%) scale(1.03);opacity:1}
+    100%{transform:translateX(-50%) scale(.98);opacity:.92}
+  }
+
+  .date-badge{
+    font-size:15px;letter-spacing:4px;color:#ffb3c6;text-transform:uppercase;
+    font-family:Georgia,serif;text-shadow:0 0 20px rgba(255,100,130,0.8);
+    animation:pulse 2s infinite;position:relative;z-index:12;padding:6px 12px;border-radius:999px;background:rgba(255,255,255,0.02)
+  }
+  @keyframes pulse{0%,100%{opacity:1}50%{opacity:.6}}
+
+  .heart-wrapper{position:relative;width:300px;height:300px;pointer-events:none}
+  canvas#heart{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);z-index:11}
+  #orbit-svg{position:absolute;top:0;left:0;width:300px;height:300px;animation:spin 9s linear infinite;z-index:10}
+  @keyframes spin{from{transform:rotate(0)}to{transform:rotate(360deg)}}
+
+  .tagline{font-size:28px;font-style:italic;color:#fff;letter-spacing:3px;z-index:12}
+  .subtitle{font-size:13px;color:rgba(200,180,255,.7);z-index:12}
+
+  /* Right-side panel */
+  .right-panel{position:fixed;right:28px;top:50%;transform:translateY(-50%);z-index:14;width:300px;pointer-events:none}
+  .right-panel .aurora{position:absolute;inset:-18px -28px -18px -28px;border-radius:18px;filter:blur(28px) saturate(140%);opacity:.95;background:radial-gradient(40% 30% at 10% 20%, rgba(120,80,255,0.22), rgba(0,0,0,0) 40%), radial-gradient(45% 28% at 85% 60%, rgba(255,120,160,0.16), rgba(0,0,0,0) 45%), linear-gradient(90deg, rgba(80,40,200,0.06), rgba(200,80,140,0.04));animation:auroraShift 6s linear infinite}
+  @keyframes auroraShift{0%{transform:translateY(0) rotate(0) scale(1);opacity:.9}50%{transform:translateY(-6px) rotate(1deg) scale(1.02);opacity:1}100%{transform:translateY(0) rotate(0) scale(1);opacity:.9}}
+
+  .love-note{position:relative;z-index:2;text-align:left;direction:ltr;padding:20px 24px;border-radius:12px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));box-shadow:0 10px 40px rgba(0,0,0,0.6)}
+  .love-note strong{display:block;font-weight:900;font-size:22px;color:#fff;margin-bottom:10px}
+  .love-note p{margin:0;font-size:17px;color:rgba(255,230,245,0.95)}
+
+  @media (max-width:900px){
+    .right-panel{display:none}
+    .moon-wrap{left:6%;top:6%;width:110px;height:110px}
+  }
+</style>
+</head>
+<body>
+
+<!-- Background canvas -->
+<canvas id="bg" aria-hidden="true"></canvas>
+
+<!-- Global aurora bands -->
+<div class="aurora-layer" aria-hidden="true">
+  <div class="aurora-band band1"></div>
+  <div class="aurora-band band2"></div>
+  <div class="aurora-band band3"></div>
+</div>
+
+<!-- Moon: replace "moon.jpg" with your real moon image filename in the repo -->
+<div class="moon-wrap" aria-hidden="true">
+  <img id="moon-img" src="moon.jpg" alt="Moon">
+  <div class="moon-glow" aria-hidden="true"></div>
+</div>
+
+<!-- Center card -->
+<div class="card" role="region" aria-label="Birthday card">
+  <div class="happy" aria-hidden="true">HAPPY BIRTHDAY</div>
+
+  <div class="date-badge">✦ June 21 ✦</div>
+
+  <div class="heart-wrapper">
+    <canvas id="heart" width="200" height="200" aria-hidden="true"></canvas>
+
+    <svg id="orbit-svg" viewBox="0 0 300 300" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+      <defs>
+        <path id="circle-path" d="M 150,150 m -118,0 a 118,118 0 1,1 236,0 a 118,118 0 1,1 -236,0"/>
+      </defs>
+      <text font-size="14" font-family="Georgia, serif" font-weight="700" fill="#ff6b8a" letter-spacing="8">
+        <textPath href="#circle-path" startOffset="0%">♥ I LOVE YOU ♥ I LOVE YOU ♥ I LOVE YOU ♥ I LOVE YOU ♥</textPath>
+      </text>
+    </svg>
+  </div>
+
+  <div class="tagline">I Love You</div>
+  <div class="subtitle">forever &amp; always ✦</div>
+</div>
+
+<!-- Right-side romantic note -->
+<div class="right-panel" aria-hidden="true">
+  <div class="aurora" aria-hidden="true"></div>
+  <div class="love-note" dir="ltr">
+    <strong>Always and forever</strong>
+    <p>You are my favorite place in the universe — every moment with you feels like home.</p>
+  </div>
+</div>
+
+<script>
+/* ---------------------------
+   Background: stars, nebula, shooting star (canvas#bg)
+   --------------------------- */
+const bg = document.getElementById('bg');
+const g = bg.getContext('2d');
+
+function resizeBg() {
+  bg.width = innerWidth;
+  bg.height = innerHeight;
+}
+resizeBg();
+addEventListener('resize', resizeBg);
+
+const stars = [];
+const floatingHearts = [];
+
+for (let i = 0; i < 320; i++) {
+  stars.push({
+    x: Math.random(),
+    y: Math.random(),
+    r: Math.random() * 1.6 + 0.2,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.8 + 0.3
+  });
+}
+
+for (let i = 0; i < 40; i++) {
+  floatingHearts.push({
+    x: Math.random(),
+    y: Math.random(),
+    size: Math.random() * 10 + 7,
+    phase: Math.random() * Math.PI * 2,
+    speed: Math.random() * 0.4 + 0.1,
+    alpha: Math.random() * 0.3 + 0.1
+  });
+}
+
+let bgTime = 0;
+
+// Shooting star (distant & occasional)
+let shooting = null;
+let shootTimer = 0;
+function spawnShootingStar() {
+  const fromLeft = Math.random() < 0.5;
+  const startX = fromLeft ? -200 : bg.width + 200;
+  const startY = Math.random() * (bg.height * 0.25);
+  const dirX = fromLeft ? 1 : -1;
+  shooting = {
+    x: startX,
+    y: startY,
+    vx: dirX * (0.6 + Math.random() * 0.6),
+    vy: 0.2 + Math.random() * 0.4,
+    life: 0,
+    maxLife: 160 + Math.floor(Math.random() * 120),
+    trail: [],
+    scale: 0.35 + Math.random() * 0.25
+  };
+}
+
+function drawBg() {
+  const w = bg.width, h = bg.height;
+  g.clearRect(0, 0, w, h);
+
+  // deep space gradient
+  const grad = g.createLinearGradient(0, 0, w, h);
+  grad.addColorStop(0, '#030014');
+  grad.addColorStop(0.45, '#050022');
+  grad.addColorStop(1, '#000010');
+  g.fillStyle = grad;
+  g.fillRect(0, 0, w, h);
+
+  // faint nebula glow
+  const neb = g.createRadialGradient(w * 0.8, h * 0.35, 0, w * 0.8, h * 0.35, w * 0.45);
+  neb.addColorStop(0, 'rgba(40,80,160,0.06)');
+  neb.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = neb;
+  g.fillRect(0, 0, w, h);
+
+  bgTime += 0.016;
+
+  // stars
+  for (const s of stars) {
+    s.phase += s.speed * 0.02;
+    const alpha = 0.35 + 0.65 * (0.5 + 0.5 * Math.sin(s.phase + bgTime * 0.02));
+    g.beginPath();
+    g.fillStyle = `rgba(255,245,255,${alpha})`;
+    g.arc(s.x * w, s.y * h, s.r, 0, Math.PI * 2);
+    g.fill();
+  }
+
+  // floating hearts (subtle)
+  for (const p of floatingHearts) {
+    const px = p.x * w + Math.sin(bgTime * p.speed + p.phase) * 25;
+    const py = p.y * h + Math.cos(bgTime * p.speed * 0.7 + p.phase) * 18;
+    const a = p.alpha * (0.5 + 0.5 * Math.sin(bgTime * p.speed * 2 + p.phase));
+    g.font = `${p.size}px serif`;
+    g.fillStyle = `rgba(255,80,130,${a})`;
+    g.fillText('♥', px, py);
+  }
+
+  // shooting star
+  if (shooting) {
+    shooting.x += shooting.vx * 6;
+    shooting.y += shooting.vy * 6;
+    shooting.life++;
+    shooting.trail.unshift({ x: shooting.x, y: shooting.y, a: 1, s: shooting.scale });
+    if (shooting.trail.length > 40) shooting.trail.pop();
+
+    for (let i = 0; i < shooting.trail.length; i++) {
+      const p = shooting.trail[i];
+      const alpha = (1 - i / shooting.trail.length) * 0.45;
+      const size = (4 * p.s) * (1 - i / shooting.trail.length) + 0.2;
+      g.beginPath();
+      const gradT = g.createRadialGradient(p.x, p.y, 0, p.x, p.y, size * 8);
+      gradT.addColorStop(0, `rgba(255,255,255,${alpha})`);
+      gradT.addColorStop(0.2, `rgba(255,220,200,${alpha * 0.45})`);
+      gradT.addColorStop(1, `rgba(255,120,160,0)`);
+      g.fillStyle = gradT;
+      g.arc(p.x, p.y, size * 6, 0, Math.PI * 2);
+      g.fill();
+    }
+
+    g.beginPath();
+    g.fillStyle = 'rgba(255,255,255,0.95)';
+    g.arc(shooting.x, shooting.y, 1.2 * shooting.scale, 0, Math.PI * 2);
+    g.fill();
+
+    if (shooting.life > shooting.maxLife || shooting.x < -300 || shooting.x > w + 300 || shooting.y > h + 300) {
+      shooting = null;
+      shootTimer = 0;
+    }
+  } else {
+    shootTimer++;
+    if (shootTimer > 220 + Math.random() * 600) spawnShootingStar();
+  }
+
+  requestAnimationFrame(drawBg);
+}
+drawBg();
+
+/* ---------------------------
+   3D Heart canvas (center)
+   --------------------------- */
+const hc = document.getElementById('heart');
+const hcCtx = hc.getContext('2d');
+let ang = 0;
+
+function hx(t) { return 16 * Math.pow(Math.sin(t), 3); }
+function hy(t) { return -(13 * Math.cos(t) - 5 * Math.cos(2 * t) - 2 * Math.cos(3 * t) - Math.cos(4 * t)); }
+
+function drawHeart() {
+  const W = hc.width, H = hc.height;
+  hcCtx.clearRect(0, 0, W, H);
+  const cx = W / 2, cy = H / 2 + 6, scale = Math.min(W, H) / 30;
+  const pts = [];
+  for (let i = 0; i <= 300; i++) {
+    const t = (i / 300) * Math.PI * 2;
+    const x3 = hx(t) * scale, y3 = hy(t) * scale;
+    const cosA = Math.cos(ang), sinA = Math.sin(ang);
+    const rx = x3 * cosA, rz = x3 * sinA;
+    pts.push({ x: cx + rx, y: cy + y3 * 0.98, d: (rz + 60) / 120 });
+  }
+
+  for (let layer = 6; layer >= 0; layer--) {
+    hcCtx.beginPath();
+    for (let i = 0; i < pts.length; i++) {
+      const p = pts[i];
+      const lx = p.x + layer * 1.2;
+      const ly = p.y + layer * 1.0;
+      if (i === 0) hcCtx.moveTo(lx, ly); else hcCtx.lineTo(lx, ly);
+    }
+    hcCtx.closePath();
+    const alpha = 0.12 - layer * 0.012;
+    hcCtx.fillStyle = `rgba(120,10,30,${Math.max(alpha, 0.02)})`;
+    hcCtx.fill();
+  }
+
+  const grad = hcCtx.createRadialGradient(cx - 28, cy - 28, 6, cx, cy, Math.max(W, H) * 0.6);
+  grad.addColorStop(0, 'rgba(255,190,205,0.98)');
+  grad.addColorStop(0.25, 'rgba(235,40,85,0.98)');
+  grad.addColorStop(0.6, 'rgba(170,10,45,0.98)');
+  grad.addColorStop(1, 'rgba(80,0,30,0.98)');
+  hcCtx.fillStyle = grad;
+  hcCtx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    if (i === 0) hcCtx.moveTo(p.x, p.y); else hcCtx.lineTo(p.x, p.y);
+  }
+  hcCtx.closePath();
+  hcCtx.fill();
+
+  const gloss = hcCtx.createRadialGradient(cx - 36, cy - 36, 1, cx - 18, cy - 18, 80);
+  gloss.addColorStop(0, 'rgba(255,255,255,0.7)');
+  gloss.addColorStop(0.4, 'rgba(255,255,255,0.12)');
+  gloss.addColorStop(1, 'rgba(255,255,255,0)');
+  hcCtx.fillStyle = gloss;
+  hcCtx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    if (i === 0) hcCtx.moveTo(p.x, p.y); else hcCtx.lineTo(p.x, p.y);
+  }
+  hcCtx.closePath();
+  hcCtx.fill();
+
+  hcCtx.beginPath();
+  for (let i = 0; i < pts.length; i++) {
+    const p = pts[i];
+    if (i === 0) hcCtx.moveTo(p.x, p.y); else hcCtx.lineTo(p.x, p.y);
+  }
+  hcCtx.closePath();
+  hcCtx.strokeStyle = 'rgba(255,180,200,0.28)';
+  hcCtx.lineWidth = 1.2;
+  hcCtx.stroke();
+
+  ang += 0.012;
+  requestAnimationFrame(drawHeart);
+}
+drawHeart();
+
+/* Optional: keyboard shortcut to spawn a comet (for testing) */
+addEventListener('keydown', (e) => {
+  if (e.key === 'c' || e.key === 'C') spawnShootingStar();
+});
+</script>
+</body>
+</html>
